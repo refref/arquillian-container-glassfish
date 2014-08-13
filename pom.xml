@@ -25,6 +25,14 @@
         <developerConnection>scm:git:ssh://github.com/arquillian/arquillian-container-glassfish.git</developerConnection>
         <url>git://github.com/arquillian/arquillian-container-glassfish.git</url>
     </scm>
+    
+    <distributionManagement>
+        <repository>
+            <id>ait-thirdparty</id>
+            <name>AIT Third Party</name>
+            <url>http://xworx.ait.ac.at/nexus/content/repositories/thirdparty/</url>
+        </repository>
+    </distributionManagement>
 
     <!-- Properties -->
     <properties>
