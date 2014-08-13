@@ -39,13 +39,16 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.jboss.arquillian.container.glassfish.CommonGlassFishConfiguration;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.CsrfProtectionFilter;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.multipart.FormDataMultiPart;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.client.filter.CsrfProtectionFilter;
+import org.glassfish.jersey.server.ContainerException;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 
 public class GlassFishClientUtil {
@@ -105,7 +108,7 @@ public class GlassFishClientUtil {
 	
     public Map GETRequest(String additionalResourceUrl) 
     {
-    	ClientResponse response = prepareClient(additionalResourceUrl).get(ClientResponse.class);
+    	Response response = prepareClient(additionalResourceUrl).get(Response.class);
     	Map responseMap = getResponseMap(response);
     	
     	return responseMap;
@@ -126,8 +129,8 @@ public class GlassFishClientUtil {
     
     public Map POSTMultiPartRequest(String additionalResourceUrl, FormDataMultiPart form) 
     {
-    	ClientResponse response = prepareClient(additionalResourceUrl).type(MediaType.MULTIPART_FORM_DATA_TYPE)
-		.post(ClientResponse.class, form);
+    	Response response = prepareClient(additionalResourceUrl).accept(MediaType.MULTIPART_FORM_DATA_TYPE)
+		.post(Entity.entity(form, form.getMediaType()), Response.class);
     	Map responseMap = getResponseMap(response);
     	
     	return responseMap;
@@ -139,22 +142,26 @@ public class GlassFishClientUtil {
      * @param additionalResourceUrl url portion past the base to use
      * @return the resource builder to execute
      */
-    private WebResource.Builder prepareClient(String additionalResourceUrl) 
+    private Invocation.Builder prepareClient(String additionalResourceUrl) 
     {
-    	final Client client = Client.create();
+    	final Client client = ClientBuilder.newClient();
         if (configuration.isAuthorisation()) {
-            client.addFilter(new HTTPBasicAuthFilter(
-													 configuration.getAdminUser(),
-													 configuration.getAdminPassword()));
+             HttpAuthenticationFeature feature = HttpAuthenticationFeature.universalBuilder()
+                    .credentialsForBasic(configuration.getAdminUser(), 
+                            configuration.getAdminPassword())
+                    .credentials(configuration.getAdminUser(), 
+                            configuration.getAdminPassword())
+                    .build();
+            client.register(feature);
         }
-        client.addFilter(new CsrfProtectionFilter());
-        return client.resource(this.adminBaseUrl + additionalResourceUrl).accept(MediaType.APPLICATION_XML_TYPE).header("X-GlassFish-3", "ignore");
+        client.register(new CsrfProtectionFilter());
+        return client.target(this.adminBaseUrl + additionalResourceUrl).request(MediaType.APPLICATION_XML_TYPE).header("X-GlassFish-3", "ignore");
     }
 	
-    private Map getResponseMap(ClientResponse response) throws ContainerException 
+    private Map getResponseMap(Response response) throws ContainerException 
     {
     	Map responseMap = new HashMap(); String message = "";
-        final String xmlDoc = response.getEntity(String.class);
+        final String xmlDoc = response.readEntity(String.class);
 		
     	// Marshalling the XML format response to a java Map
         if (xmlDoc != null && !xmlDoc.isEmpty()) {
@@ -164,7 +171,7 @@ public class GlassFishClientUtil {
 			+ ", message: "+ responseMap.get("message");	    		        	
         } 
 		
-    	ClientResponse.Status status = ClientResponse.Status.fromStatusCode(response.getStatus());
+    	Response.Status status = Response.Status.fromStatusCode(response.getStatus());
 	    if ( status.getFamily() == javax.ws.rs.core.Response.Status.Family.SUCCESSFUL ) {
 			
 	       // O.K. the jersey call was successful, what about the GlassFish server response?

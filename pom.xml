@@ -15,7 +15,7 @@
     <!-- Artifact Configuration -->
     <groupId>org.jboss.arquillian.container</groupId>
     <artifactId>arquillian-parent-glassfish</artifactId>
-    <version>1.0.0.CR4</version>
+    <version>1.0.0.CR4-xworx</version>
     <packaging>pom</packaging>
     <name>Arquillian Container Parent GlassFish</name>
     <description>GlassFish Container integrations for the Arquillian Project</description>
@@ -30,7 +30,7 @@
     <properties>
 
         <version.arquillian_core>1.0.0.Final</version.arquillian_core>
-        <version.jersey>1.10</version.jersey>
+        <version.jersey>2.10.1</version.jersey>
         <version.jboss.javaee-6_api>1.0.0.Final</version.jboss.javaee-6_api>
 
         <!-- override from parent -->
@@ -42,13 +42,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-bundle</artifactId>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
                 <version>${version.jersey}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.jersey.contribs</groupId>
-                <artifactId>jersey-multipart</artifactId>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
                 <version>${version.jersey}</version>
             </dependency>
 
