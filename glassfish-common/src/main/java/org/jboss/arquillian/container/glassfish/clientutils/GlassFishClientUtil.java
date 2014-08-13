@@ -30,25 +30,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import org.jboss.arquillian.container.glassfish.CommonGlassFishConfiguration;
-
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.client.filter.CsrfProtectionFilter;
-import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.server.ContainerException;
+import org.jboss.arquillian.container.glassfish.CommonGlassFishConfiguration;
 
 
 public class GlassFishClientUtil {
@@ -155,6 +152,7 @@ public class GlassFishClientUtil {
             client.register(feature);
         }
         client.register(new CsrfProtectionFilter());
+        client.register(MultiPartFeature.class);
         return client.target(this.adminBaseUrl + additionalResourceUrl).request(MediaType.APPLICATION_XML_TYPE).header("X-GlassFish-3", "ignore");
     }
 	
