@@ -289,7 +289,8 @@ public class GlassFishClientService implements GlassFishClient {
 	public Map doUndeploy(String name, FormDataMultiPart form) 
 	{
 	    String path = APPLICATION_RESOURCE.replace("{name}", name);
-		return getClientUtil().POSTMultiPartRequest(path, form);
+//		return getClientUtil().POSTMultiPartRequest(path, form);
+		return getClientUtil().DELETERequest(path);
 	}
 	
 	/**

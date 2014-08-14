@@ -110,6 +110,14 @@ public class GlassFishClientUtil {
     	
     	return responseMap;
 	}
+
+    public Map DELETERequest(String additionalResourceUrl) 
+    {
+    	Response response = prepareClient(additionalResourceUrl).delete(Response.class);
+    	Map responseMap = getResponseMap(response);
+    	
+    	return responseMap;
+    }
     
     public List<Map> getInstancesList(String additionalResourceUrl) throws ContainerException 
     {
